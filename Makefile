@@ -25,7 +25,7 @@ stydir=$(texlib)/tex/latex/harvard
 docdir=$(texlib)/doc/latex/harvard
 # htmldir=/people/archsci/archsci-www/utils/latex2html/styles
 
-BSTS=agsm.bst dcu.bst jmr.bst jphysicsB.bst kluwer.bst nederlands.bst apsr.bst OU.bst
+BSTS=OU.bst
 
 all:
 
