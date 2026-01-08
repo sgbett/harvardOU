@@ -836,11 +836,8 @@ FUNCTION {book}
     { format.editors.reverse output new.block }
   if$
 
-  %Place of Publication: Publisher
-  place duplicate$ "place" item.check
-  ": " *
-  publisher duplicate$ "publisher" item.check
-  * output new.block
+  %Publisher
+  publisher "publisher" item.check output new.block
 
 %  crossref missing$
 %    { format.bvolume output
@@ -854,6 +851,26 @@ FUNCTION {book}
   DOI_or_URL output new.block
   note output
   fin.entry
+
+% One author:
+% Hill, F. (2023) There's nothing for you here: finding opportunity in the twenty-first century. Mariner Books.
+% McCormick, J.M. (2023) American foreign policy and process. 7th edn. Cambridge University Press.
+% Two or three authors:
+% Christensen, J., Molander, A. and Holst, C. (2023) Expertise, policy-making and democracy: leave it to the experts? Taylor & Francis.
+% Squire, R. and Jackman, A. (2023) Political geography: approaches, concepts, futures. Sage.
+% Four or more authors:
+% Petit, V. et al. (2020) The anthropological demography of health. Oxford University Press.
+% With an editor:
+% Zurbriggen, E.L. and Capdevila, R. (eds) (2024) The Palgrave handbook of power, gender, and psychology. Palgrave Macmillan.
+% With author(s) and editor(s):
+% Orksun, B. (2017) Healthcare management. 7th UK edn. Edited by B. Jones and D. Kirk. Medical Press Ltd.
+% No author:
+% Treasures of Britain and treasures of Ireland (1990) Reader's Digest Association Ltd.
+% Organisation as author:
+% Modern Language Association (2021) MLA handbook. 9th edn. Modern Language Association of America.
+% Later and revised editions:
+% Moxon, J. (2013) The art of joinery. Rev. edn. Lost Art Press.
+% Steinberg, E.L. (2016) Court music of Henry V. 4th rev. edn. Oxford University Press.
 }
 
 FUNCTION {bookchapter}
@@ -883,10 +900,8 @@ FUNCTION {bookchapter}
 
   output new.block
 
-  %Place of Publication: Publisher
-  place duplicate$ "place" item.check
-  ": " *
-  publisher duplicate$ "publisher" item.check *
+  %Publisher
+  publisher "publisher" item.check
 
   pages missing$
     { skip$ }
@@ -912,7 +927,6 @@ FUNCTION {booklet}
     { format.title quote "title" output.check }
   if$
   howpublished output
-  place output
   new.block
   DOI_or_URL output new.block
   note output
@@ -935,20 +949,18 @@ FUNCTION {film}
   format.directors.reverse output
   new.block
 
-  %Place of distribution: Distributor
+  %Distributor
   distributor missing$
     { skip$ }
-    {
-      place duplicate$ "place" item.check
-      ": " * distributor * output new.block
-    }
+    { distributor output new.block }
   if$
 
   DOI_or_URL output
   note output
   fin.entry
 
-% Fahrenheit 9/11 (2004) Directed by M. Moore. [Feature film]. Santa Monica, CA: Lionsgate Films.
+% Fahrenheit 9/11 (2004) Directed by M. Moore. [Feature film]. Lionsgate Films.
+% Hoard (2023) Directed by L. Carmoon. [Feature film]. Erebus Pictures.
 }
 
 FUNCTION {inbook}
@@ -972,7 +984,6 @@ FUNCTION {inbook}
       format.number.series output
       format.edition output
       publisher "publisher" output.check
-      place output
     }
     { format.book.crossref output.nonnull
       format.edition output
@@ -1000,7 +1011,6 @@ FUNCTION {incollection}
       format.bvolume output
       format.number.series output
       publisher "publisher" output.check
-      place output
     }
     { format.incoll.inproc.crossref output.nonnull
     }
@@ -1025,15 +1035,8 @@ FUNCTION {inproceedings}
     { format.in.ed.booktitle "booktitle" output.check
       format.bvolume output
       format.number.series output
-      place empty$
-	{ organization output
-	  publisher output
-	}
-	{ organization output
-	  publisher output
-          place output.nonnull
- 	}
-      if$
+      organization output
+      publisher output
     }
     { format.incoll.inproc.crossref output.nonnull
     }
@@ -1055,14 +1058,8 @@ FUNCTION {manual}
   if$
   format.edition output
   author empty$
-    { organization empty$
-	{ place output }
-	'skip$
-      if$
-    }
-    { organization output
-      place output
-    }
+    { skip$ }
+    { organization output }
   if$
   new.block
   DOI_or_URL output new.block
@@ -1081,7 +1078,6 @@ FUNCTION {mastersthesis}
   if$
   "Master's thesis" format.thesis.type output.nonnull
   school "school" output.check
-  place output
   new.block
   DOI_or_URL output new.block
   note output
@@ -1164,7 +1160,6 @@ FUNCTION {phdthesis}
   if$
   "PhD thesis" format.thesis.type output.nonnull
   school "school" output.check
-  place output
   new.block
   DOI_or_URL output new.block
   note output
@@ -1201,22 +1196,11 @@ FUNCTION {proceedings}
   if$
   format.bvolume output
   format.number.series output
-  place empty$
-    { editor empty$
-	{ skip$ }
-	{ organization output
-	}
-      if$
-      publisher output
-    }
-    { editor empty$
-	'skip$
-	{ organization output }
-      if$
-      publisher output
-      place output.nonnull
-    }
+  editor empty$
+    'skip$
+    { organization output }
   if$
+  publisher output
   new.block
   DOI_or_URL output new.block
   note output
@@ -1234,7 +1218,6 @@ FUNCTION {techreport}
   if$
   format.tr.number output.nonnull
   institution "institution" output.check
-  place output
   new.block
   DOI_or_URL output new.block
   note output
