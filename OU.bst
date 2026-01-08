@@ -900,7 +900,7 @@ FUNCTION {bookchapter}
     { skip$ }
     { author missing$
       { skip$ }
-      { "in " * format.editors * " " * }
+      { "in " * format.editors * ", " * }
     if$ }
   if$
 
@@ -963,7 +963,7 @@ FUNCTION {film}
   " \harvardyearleft " list.year * "\harvardyearright " * output
 
   %Directed by director. [Feature film]
-  format.directors.reverse output
+  format.directors.reverse mediaformat * output
   new.block
 
   %Distributor
