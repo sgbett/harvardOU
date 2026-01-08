@@ -1140,6 +1140,13 @@ FUNCTION {module}
 
   note output
   fin.entry
+
+% Web page with individual author:
+% McCormack, D. (2024) Biographicon. Available at: https://biographicon.net/ (Accessed: 1 June 2024).
+% Web page with organisation as author:
+% American Psychological Association (2024) Misinformation and disinformation. Available at: https://www.apa.org/topics/journalism-facts/misinformationdisinformation (Accessed: 1 June 2024).
+% Web page with no date:
+% Flixel (no date) Magical tools for visual storytelling. Available at: https://flixel.com/company/ (Accessed: 1 June 2024).
 }
 
 FUNCTION {multimedia}
