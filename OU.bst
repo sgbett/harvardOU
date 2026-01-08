@@ -304,7 +304,7 @@ FUNCTION {format.directors.reverse}
 FUNCTION {format.edition}
 { edition empty$
     { "" }
-    { "this edition " edition * bracket " " swap$ * }
+    { edition " edn" * }
   if$
 }
 
@@ -862,10 +862,7 @@ FUNCTION {book}
   format.translators.reverse output new.block
 
   %Edition
-  edition missing$
-    { skip$ }
-    { edition " edn" * output new.block }
-  if$
+  format.edition output new.block
 
   %Edited by Initial. Surname (unless author is missing)
   author missing$
