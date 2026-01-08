@@ -10,7 +10,7 @@
 # version 2005/12/01 or later.
 #
 # This work has the LPPL maintenance status `maintained'.
-# 
+#
 # The Current Maintainers of this work are Peter Williams and Thorsten Schnier.
 #
 # This work consists of all files listed in manifest.txt.
@@ -18,14 +18,14 @@
 # Licence notice added on behalf of Peter Williams and Thorsten Schnier
 # by Clea F. Rees 2009/01/30.
 
-prefix=/opt/TeX
-texlib=$(prefix)/lib/texmf
+prefix=/usr/local/texlive/2020
+texlib=$(prefix)/texmf-dist
 bstdir=$(texlib)/bibtex/bst/harvard
-stydir=$(texlib)/tex/latex/local
-docdir=$(texlib)/bibtex/doc/harvard
-htmldir=/people/archsci/archsci-www/utils/latex2html/styles
+stydir=$(texlib)/tex/latex/harvard
+docdir=$(texlib)/doc/latex/harvard
+# htmldir=/people/archsci/archsci-www/utils/latex2html/styles
 
-BSTS=agsm.bst dcu.bst jmr.bst jphysicsB.bst kluwer.bst nederlands.bst apsr.bst
+BSTS=agsm.bst dcu.bst jmr.bst jphysicsB.bst kluwer.bst nederlands.bst apsr.bst OU.bst
 
 all:
 
@@ -42,13 +42,13 @@ harvard.bbl: harvard.aux harvard.bib
 harvard.aux: harvard.tex
 	latex harvard
 
-install: harvard.sty harvard.perl $(BSTS)
+install: harvard.sty $(BSTS)
 	mkdir -p $(bstdir)
 	mkdir -p $(stydir)
-	mkdir -p $(htmldir)
+	# mkdir -p $(htmldir)
 	cp $(BSTS) $(bstdir)
 	cp harvard.sty $(stydir)
-	cp harvard.perl $(htmldir)
+	# cp harvard.perl $(htmldir)
 
 install_doc: harvard.tex harvard.bib
 	mkdir -p $(docdir)
