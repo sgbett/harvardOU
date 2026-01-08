@@ -66,3 +66,45 @@ The `.bst` file uses BibTeX's stack-based language:
 - `output.*` functions manage output state and punctuation
 - `ENTRY` block defines available fields
 - `DOI_or_URL` function outputs DOI (preferred) or URL with access date
+
+## Adding Cite Them Right Example Comments
+
+Each entry type function in OU.bst should have example comments showing the correct reference format. To add examples for a new entry type:
+
+### Process
+
+1. **Get the Cite Them Right source**: Download the relevant page from https://www.citethemrightonline.com as XML and save to `citethemright/<entrytype>.xml`. The user can log in via their institution and save page source.
+
+2. **Read the XML file**: Extract the "Reference list" examples from the XML. Look for `<strong>Reference list</strong>` sections followed by `<p>` tags containing the formatted examples.
+
+3. **Find the function in OU.bst**: Search for `FUNCTION {<entrytype>}` and locate the closing brace `}`.
+
+4. **Add comments before the closing brace**: Insert examples as comments between `fin.entry` and `}`:
+   ```
+     fin.entry
+
+   % Example description:
+   % Author, A. (Year) Title details. Publisher.
+   }
+   ```
+
+5. **Verify format matches**: Ensure the example format matches what the OU.bst function produces. Note any discrepancies (e.g., place of publication was removed in 2025 update).
+
+### Entry Types with Examples Added
+
+- `article` - journal articles (print, DOI, URL, article number)
+- `book` - printed books (one author, multiple authors, editors, no author, organisation, editions)
+- `bookchapter` - chapters in edited books
+- `film` - films/movies
+- `module` - web pages / OU module materials
+
+### Entry Types Still Needing Examples
+
+- `misc`, `multimedia`, `photograph`, `incollection`
+- Standard types: `booklet`, `inbook`, `inproceedings`, `conference`, `manual`, `mastersthesis`, `phdthesis`, `proceedings`, `techreport`, `unpublished`
+
+### Notes
+
+- The Cite Them Right 13th edition (2025) removed place of publication for books
+- OU follows this updated style
+- When examples don't match the function output, update the function to match Cite Them Right (after verification)
