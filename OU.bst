@@ -926,6 +926,13 @@ FUNCTION {bookchapter}
   note output new.block
 
   fin.entry
+
+% Chapter with editors:
+% Cole, E.R. (2023) 'Beyond identity: intersectionality and power', in E.L. Zurbriggen and R. Capdevila (eds), The Palgrave handbook of power, gender, and psychology. Palgrave Macmillan, pp. 29–42.
+% Chapter from online reference work (with DOI):
+% Olby, R. (2014) 'Crick, Francis Harry Compton (1916–2004)', in Oxford dictionary of national biography (Online edn). Oxford University Press. Available at: https://doi.org/10.1093/ref:odnb/93883
+% Entry with no author:
+% 'Spielbergian' (2023) Oxford English dictionary. Available at: https://www.oed.com/dictionary/spielbergian_adj (Accessed: 21 June 2024).
 }
 
 FUNCTION {booklet}
