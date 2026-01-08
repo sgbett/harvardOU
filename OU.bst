@@ -1168,8 +1168,15 @@ FUNCTION {misc}
 { output.bibitem
   list.label.output
   " \harvardyearleft " list.year * "\harvardyearright " * output.nonnull
-  "\hphantom{ }" title * "," * output
+  title.field field.used =
+    { skip$ }
+    { format.title quote output }
+  if$
+  howpublished output
   month output
+  new.block
+  DOI_or_URL output new.block
+  note output
   fin.entry
   empty.misc.check
 }
