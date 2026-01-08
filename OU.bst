@@ -17,28 +17,40 @@
 %   Simon Bettison, Bettison.org Limited.
 %   e-mail: simon@bettison.org
 
+% more info: http://tug.ctan.org/info/bibtex/tamethebeast/ttb_en.pdf
+
 ENTRY
   { address
     author
     booktitle
     chapter
+    DOI
     edition
     editor
+    director
+    distributor
     howpublished
     institution
     journal
     key
+    media
+    moduletitle
     month
     note
     number
     organization
     pages
+    place
     publisher
     school
     series
     title
+    translatedfrom
+    translatedby
+    translationyear
     type
     URL
+    URLDate
     volume
     year
   }
@@ -59,7 +71,13 @@ STRINGS { s t f }
 FUNCTION {output.nonnull}
 { 's :=
   output.state mid.sentence =
-    { ", " * write$ }
+    { duplicate$ empty$
+      { skip$ }
+      {" " * write$}
+
+      if$
+    }
+
     { output.state after.block =
 	{ add.period$ write$
 	  newline$
@@ -159,10 +177,43 @@ FUNCTION {quote}
   if$
 }
 
-FUNCTION {write.url}
-{ URL empty$
-    { skip$ }
-    { "\newline\harvardurl{" URL * "}" * write$ newline$ }
+FUNCTION {bracket}
+{ duplicate$ empty$
+    { pop$ "" }
+    { "(" swap$ * ")" * }
+  if$
+}
+
+FUNCTION {online}
+{ URL missing$
+    { "" }
+    { " [Online]" }
+  if$
+}
+
+FUNCTION {mediaformat}
+{ media missing$
+    { "" }
+    { " [" media * "]" * }
+  if$
+}
+
+FUNCTION {url_access}
+{ duplicate$ empty$
+    { pop$ "" }
+    { "Accessed: " swap$ * bracket " " swap$ * }
+  if$
+}
+
+FUNCTION {DOI_or_URL}
+{ DOI missing$
+    {
+      URL missing$
+        { "" }
+        { "Available at: " URL * URLDate url_access * }
+      if$
+    }
+    { "Available at: https://doi.org/" DOI * }
   if$
 }
 
@@ -205,10 +256,10 @@ FUNCTION {format.editors}
 { editor empty$
     { "" }
     { "{vv~}{ll}{, jj}{, f.}" editor format.names
-      editor num.names$ #1 >
-	{ ", eds" * }
-	{ ", ed." * }
-      if$
+    editor num.names$ #1 >
+      { " (eds)" * }
+      { " (ed.)" * }
+    if$
     }
   if$
 }
@@ -217,11 +268,43 @@ FUNCTION {format.editors.reverse}
 { editor empty$
     { "" }
     { "{f.~}{vv~}{ll}{, jj}" editor format.names
-      editor num.names$ #1 >
-	{ ", eds" * }
-	{ ", ed." * }
-      if$
+    "Edited by " swap$ *
     }
+  if$
+}
+
+FUNCTION {format.translators.reverse}
+{ translatedby empty$
+    { "" }
+    {
+      %translationyear bracket *
+      " (Translated"
+
+      mid.sentence 'output.state :=
+
+      translatedfrom empty$
+        { "" }
+        { " from the " * translatedfrom * }
+      if$ *
+
+      " by {f.~}{vv~}{ll}{, jj}" translatedby format.names ")" *
+    }
+  if$
+}
+
+FUNCTION {format.directors.reverse}
+{ director empty$
+    { "" }
+    { "{f.~}{vv~}{ll}{, jj}" director format.names
+    "Directed by " swap$ *
+    }
+  if$
+}
+
+FUNCTION {format.edition}
+{ edition empty$
+    { "" }
+    { "this edition " edition * bracket " " swap$ * }
   if$
 }
 
@@ -259,6 +342,10 @@ FUNCTION {n.dashify}
 
 FUNCTION {format.btitle}
 { title emphasize
+}
+
+FUNCTION {format.chapter}
+{ "'" chapter * "'" * *
 }
 
 FUNCTION {tie.or.space.connect}
@@ -309,17 +396,6 @@ FUNCTION {format.number.series}
   if$
 }
 
-FUNCTION {format.edition}
-{ edition empty$
-    { "" }
-    { output.state mid.sentence =
-	{ edition "l" change.case$ " edn" * }
-	{ edition "t" change.case$ " edn" * }
-      if$
-    }
-  if$
-}
-
 INTEGERS { multiresult }
 
 FUNCTION {multi.page.check}
@@ -354,7 +430,7 @@ FUNCTION {format.pages}
 }
 
 FUNCTION {format.vol.num.pages}
-{ volume embolden field.or.null
+{ volume field.or.null
   number empty$
     'skip$
     { "(" number * ")" * *
@@ -368,10 +444,27 @@ FUNCTION {format.vol.num.pages}
     'skip$
     { duplicate$ empty$
 	{ pop$ format.pages }
-	{ ",~" * pages n.dashify * }
+	{ ",~ pp. " * pages n.dashify * }
       if$
     }
   if$
+}
+
+FUNCTION {format.journal}
+{ format.vol.num.pages empty$
+    { "" }
+    { " " format.vol.num.pages * }
+  if$
+  journal empty$
+    { "" }
+    { title missing$
+      { "" }
+      { ", " }
+      if$
+      journal emphasize *
+    }
+  if$
+  swap$ *
 }
 
 FUNCTION {format.chapter.pages}
@@ -688,60 +781,116 @@ FUNCTION {list.label.output}
 { make.list.label " " * write$
 }
 
-FUNCTION {article}
-{ output.bibitem
-  list.label.output
-  " \harvardyearleft " list.year * "\harvardyearright " * output.nonnull
-  author "author" item.check
-  title.field field.used =
-    { skip$ }
-    { format.title quote "title" output.check }
-  if$
-  crossref missing$
-    { journal emphasize "journal" duplicate$ item.check
-      " " * format.vol.num.pages * output
-    }
-    { format.article.crossref output.nonnull
-      format.pages output
-    }
-  if$
+FUNCTION {film}
+{
+
+  output.bibitem
+
+  %Title of film (in italics)
+  title emphasize "title" duplicate$ item.check output
+
+  %Year of distribution (in round brackets)
+  " \harvardyearleft " list.year * "\harvardyearright " * output
+
+  %Directed by director. [Feature film]
+  format.directors.reverse output
   new.block
+
+  %Place of distribution: Distributor
+  distributor missing$
+    { skip$ }
+    {
+      place duplicate$ "place" item.check
+      ": " * distributor * output new.block
+    }
+  if$
+
+  DOI_or_URL output
   note output
   fin.entry
-  write.url
+
+% Fahrenheit 9/11 (2004) Directed by M. Moore. [Feature film]. Santa Monica, CA: Lionsgate Films.
 }
 
-FUNCTION {book}
-{ output.bibitem
+FUNCTION {article}
+{
+
+  output.bibitem
+
+  % Surname, Initial.
   list.label.output
+
+  % (Year of Publication) Title
   " \harvardyearleft " list.year * "\harvardyearright " * output.nonnull
-  author empty$
-    { editor "author and editor" item.check }
-    { crossref missing$
-	{ "author and editor" editor either.or.check }
-	'skip$
-      if$
-    }
-  if$
-  title.field field.used =
-    { skip$ }
-    { format.btitle "title" output.check }
-  if$
-  crossref missing$
-    { format.bvolume output
-      format.number.series output
-      format.edition output
-      publisher "publisher" output.check
-      address output
-    }
-    { format.book.crossref output.nonnull
-      format.edition output
-    }
-  if$
-  new.block
+  " \enspace " * title quote "title" duplicate$ item.check
+
+  % Title of Journal, Issue information (that is, volume (unbracketed) and, where applicable, part number, month or season (all in round brackets)), Page reference (if available)
+
+  format.journal * output new.block
+
+  %DOI or Available at: URL (if required) (Accessed: date)
+  DOI_or_URL output new.block
+
+%  crossref missing$
+%    { skip$ }
+%    { format.article.crossref output.nonnull
+%      format.pages *
+%    }
+%  if$
+
   note output
   fin.entry
-  write.url
+}
+
+
+
+FUNCTION {book}
+{
+  %Surname, Initial.
+  output.bibitem
+
+  %(Year of Publication) Title
+  list.year empty$
+    { make.list.label output.nonnull "" }
+    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  if$
+  title.field field.used =
+    { output }
+    { format.btitle duplicate$ "title" item.check * output new.block}
+  if$
+
+  format.translators.reverse output new.block
+
+  %Edition
+  edition missing$
+    { skip$ }
+    { edition " edn" * output new.block }
+  if$
+
+  %Edited by Initial. Surname (unless author is missing)
+  author missing$
+    { skip$ }
+    { format.editors.reverse output new.block }
+  if$
+
+  %Place of Publication: Publisher
+  place duplicate$ "place" item.check
+  ": " *
+  publisher duplicate$ "publisher" item.check
+  * output new.block
+
+%  crossref missing$
+%    { format.bvolume output
+%      format.number.series output
+%      format.edition * output
+%    }
+%    { format.book.crossref output.nonnull
+%    }
+%  if$
+
+  DOI_or_URL output new.block
+  note output
+  fin.entry
 }
 
 FUNCTION {booklet}
@@ -753,11 +902,127 @@ FUNCTION {booklet}
     { format.title quote "title" output.check }
   if$
   howpublished output
-  address output
+  place output
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
+}
+
+FUNCTION {photograph}
+{
+  %Surname, Initial.
+  output.bibitem
+
+  %(Year of Publication) Title
+  list.year empty$
+    { make.list.label output.nonnull "" }
+    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  if$
+
+  title emphasize * output new.block
+
+  %DOI or Available at: URL (if required) (Accessed: date)
+  DOI_or_URL output new.block
+
+  note output
+  fin.entry
+}
+
+
+FUNCTION {bookchapter}
+{
+  %Surname, Initial.
+  output.bibitem
+
+  %(Year of Publication) Title
+  list.year empty$
+    { make.list.label output.nonnull "" }
+    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  if$
+
+  format.chapter ", " *
+
+  editor missing$
+    { skip$ }
+    { author missing$
+      { skip$ }
+      { "in " * format.editors * " " * }
+    if$ }
+  if$
+
+  title emphasize * online *
+
+  format.translators.reverse output new.block
+
+  output new.block
+
+  %Place of Publication: Publisher
+  place duplicate$ "place" item.check
+  ": " *
+  publisher duplicate$ "publisher" item.check *
+
+  pages missing$
+    { skip$ }
+    { ", " * format.pages * }
+  if$
+
+  output new.block
+
+  %DOI or Available at: URL (if required) (Accessed: date)
+  DOI_or_URL output new.block
+
+  note output new.block
+
+  fin.entry
+}
+
+FUNCTION {module}
+{
+  %Surname, Initial.
+  output.bibitem
+
+  %(Year of Publication) Title
+  list.year empty$
+    { make.list.label output.nonnull "" }
+    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  if$
+
+  format.title quote ". " * output new.block
+
+  moduletitle emphasize * output new.block
+
+  format.translators.reverse output
+
+  %DOI or Available at: URL (if required) (Accessed: date)
+  DOI_or_URL output new.block
+
+  note output
+  fin.entry
+}
+
+FUNCTION {multimedia}
+{
+  %Surname, Initial.
+  output.bibitem
+
+  %(Year of Publication) Title
+  list.year empty$
+    { make.list.label output.nonnull "" }
+    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  if$
+
+  format.title quote mediaformat * ". " * output new.block
+
+  moduletitle emphasize * output new.block
+
+  format.translators.reverse output
+
+  %DOI or Available at: URL (if required) (Accessed: date)
+  DOI_or_URL output new.block
+
+  note output
+  fin.entry
 }
 
 FUNCTION {inbook}
@@ -781,7 +1046,7 @@ FUNCTION {inbook}
       format.number.series output
       format.edition output
       publisher "publisher" output.check
-      address output
+      place output
     }
     { format.book.crossref output.nonnull
       format.edition output
@@ -789,9 +1054,9 @@ FUNCTION {inbook}
   if$
   format.chapter.pages "chapter and pages" output.check
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
 }
 
 FUNCTION {incollection}
@@ -809,16 +1074,16 @@ FUNCTION {incollection}
       format.bvolume output
       format.number.series output
       publisher "publisher" output.check
-      address output
+      place output
     }
     { format.incoll.inproc.crossref output.nonnull
     }
   if$
   format.chapter.pages output
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
 }
 
 FUNCTION {inproceedings}
@@ -834,13 +1099,13 @@ FUNCTION {inproceedings}
     { format.in.ed.booktitle "booktitle" output.check
       format.bvolume output
       format.number.series output
-      address empty$
+      place empty$
 	{ organization output
 	  publisher output
 	}
 	{ organization output
 	  publisher output
-          address output.nonnull
+          place output.nonnull
  	}
       if$
     }
@@ -849,9 +1114,9 @@ FUNCTION {inproceedings}
   if$
   format.pages output
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
 }
 
 FUNCTION {conference} { inproceedings }
@@ -867,18 +1132,18 @@ FUNCTION {manual}
   format.edition output
   author empty$
     { organization empty$
-	{ address output }
+	{ place output }
 	'skip$
       if$
     }
     { organization output
-      address output
+      place output
     }
   if$
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
 }
 
 FUNCTION {mastersthesis}
@@ -892,26 +1157,20 @@ FUNCTION {mastersthesis}
   if$
   "Master's thesis" format.thesis.type output.nonnull
   school "school" output.check
-  address output
+  place output
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
 }
 
 FUNCTION {misc}
 { output.bibitem
   list.label.output
   " \harvardyearleft " list.year * "\harvardyearright " * output.nonnull
-  title.field field.used =
-    { skip$ }
-    { format.title quote output }
-  if$
-  howpublished output
-  new.block
-  note output
+  "\hphantom{ }" title * "," * output
+  month output
   fin.entry
-  write.url
   empty.misc.check
 }
 
@@ -926,11 +1185,11 @@ FUNCTION {phdthesis}
   if$
   "PhD thesis" format.thesis.type output.nonnull
   school "school" output.check
-  address output
+  place output
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
 }
 
 FUNCTION {proceedings}
@@ -943,7 +1202,7 @@ FUNCTION {proceedings}
   if$
   format.bvolume output
   format.number.series output
-  address empty$
+  place empty$
     { editor empty$
 	{ skip$ }
 	{ organization output
@@ -956,13 +1215,13 @@ FUNCTION {proceedings}
 	{ organization output }
       if$
       publisher output
-      address output.nonnull
+      place output.nonnull
     }
   if$
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
 }
 
 FUNCTION {techreport}
@@ -976,11 +1235,11 @@ FUNCTION {techreport}
   if$
   format.tr.number output.nonnull
   institution "institution" output.check
-  address output
+  place output
   new.block
+  DOI_or_URL output new.block
   note output
   fin.entry
-  write.url
 }
 
 FUNCTION {unpublished}
@@ -993,9 +1252,9 @@ FUNCTION {unpublished}
     { format.title "title" output.check }
   if$
   new.block
+  DOI_or_URL output new.block
   note "note" output.check
   fin.entry
-  write.url
 }
 
 FUNCTION {default.type} { misc }
@@ -1285,7 +1544,7 @@ FUNCTION {reverse.pass}
     'skip$
   if$
   year empty$
-    { "n.d." extra.label emphasize * 'list.year := }
+    { skip$ }
     { year extra.label emphasize * 'list.year := }
   if$
   extra.label 'next.extra :=
