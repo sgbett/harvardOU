@@ -1551,7 +1551,7 @@ FUNCTION {reverse.pass}
     'skip$
   if$
   year empty$
-    { skip$ }
+    { "n.d." extra.label emphasize * 'list.year := }
     { year extra.label emphasize * 'list.year := }
   if$
   extra.label 'next.extra :=
