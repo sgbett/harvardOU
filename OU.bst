@@ -782,40 +782,8 @@ FUNCTION {list.label.output}
 { make.list.label " " * write$
 }
 
-FUNCTION {film}
-{
-
-  output.bibitem
-
-  %Title of film (in italics)
-  title emphasize "title" duplicate$ item.check output
-
-  %Year of distribution (in round brackets)
-  " \harvardyearleft " list.year * "\harvardyearright " * output
-
-  %Directed by director. [Feature film]
-  format.directors.reverse output
-  new.block
-
-  %Place of distribution: Distributor
-  distributor missing$
-    { skip$ }
-    {
-      place duplicate$ "place" item.check
-      ": " * distributor * output new.block
-    }
-  if$
-
-  DOI_or_URL output
-  note output
-  fin.entry
-
-% Fahrenheit 9/11 (2004) Directed by M. Moore. [Feature film]. Santa Monica, CA: Lionsgate Films.
-}
-
 FUNCTION {article}
 {
-
   output.bibitem
 
   % Surname, Initial.
@@ -826,7 +794,6 @@ FUNCTION {article}
   " \enspace " * title quote "title" duplicate$ item.check
 
   % Title of Journal, Issue information (that is, volume (unbracketed) and, where applicable, part number, month or season (all in round brackets)), Page reference (if available)
-
   format.journal * output new.block
 
   %DOI or Available at: URL (if required) (Accessed: date)
@@ -889,42 +856,6 @@ FUNCTION {book}
   fin.entry
 }
 
-FUNCTION {booklet}
-{ output.bibitem
-  list.label.output
-  " \harvardyearleft " list.year * "\harvardyearright " * output.nonnull
-  title.field field.used =
-    { skip$ }
-    { format.title quote "title" output.check }
-  if$
-  howpublished output
-  place output
-  new.block
-  DOI_or_URL output new.block
-  note output
-  fin.entry
-}
-
-FUNCTION {photograph}
-{
-  %Surname, Initial.
-  output.bibitem
-
-  %(Year of Publication) Title
-  list.year empty$
-    { make.list.label output.nonnull "" }
-    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
-  if$
-
-  title emphasize * output new.block
-
-  %DOI or Available at: URL (if required) (Accessed: date)
-  DOI_or_URL output new.block
-
-  note output
-  fin.entry
-}
-
 FUNCTION {bookchapter}
 {
   %Surname, Initial.
@@ -972,52 +903,52 @@ FUNCTION {bookchapter}
   fin.entry
 }
 
-FUNCTION {module}
-{
-  %Surname, Initial.
-  output.bibitem
-
-  %(Year of Publication) Title
-  list.year empty$
-    { make.list.label output.nonnull "" }
-    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+FUNCTION {booklet}
+{ output.bibitem
+  list.label.output
+  " \harvardyearleft " list.year * "\harvardyearright " * output.nonnull
+  title.field field.used =
+    { skip$ }
+    { format.title quote "title" output.check }
   if$
-
-  format.title quote ". " * output new.block
-
-  moduletitle emphasize * output new.block
-
-  format.translators.reverse output
-
-  %DOI or Available at: URL (if required) (Accessed: date)
+  howpublished output
+  place output
+  new.block
   DOI_or_URL output new.block
-
   note output
   fin.entry
 }
 
-FUNCTION {multimedia}
+FUNCTION {conference} { inproceedings }
+
+FUNCTION {film}
 {
-  %Surname, Initial.
   output.bibitem
 
-  %(Year of Publication) Title
-  list.year empty$
-    { make.list.label output.nonnull "" }
-    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  %Title of film (in italics)
+  title emphasize "title" duplicate$ item.check output
+
+  %Year of distribution (in round brackets)
+  " \harvardyearleft " list.year * "\harvardyearright " * output
+
+  %Directed by director. [Feature film]
+  format.directors.reverse output
+  new.block
+
+  %Place of distribution: Distributor
+  distributor missing$
+    { skip$ }
+    {
+      place duplicate$ "place" item.check
+      ": " * distributor * output new.block
+    }
   if$
 
-  format.title quote mediaformat * ". " * output new.block
-
-  moduletitle emphasize * output new.block
-
-  format.translators.reverse output
-
-  %DOI or Available at: URL (if required) (Accessed: date)
-  DOI_or_URL output new.block
-
+  DOI_or_URL output
   note output
   fin.entry
+
+% Fahrenheit 9/11 (2004) Directed by M. Moore. [Feature film]. Santa Monica, CA: Lionsgate Films.
 }
 
 FUNCTION {inbook}
@@ -1114,8 +1045,6 @@ FUNCTION {inproceedings}
   fin.entry
 }
 
-FUNCTION {conference} { inproceedings }
-
 FUNCTION {manual}
 { output.bibitem
   list.label.output
@@ -1176,6 +1105,54 @@ FUNCTION {misc}
   empty.misc.check
 }
 
+FUNCTION {module}
+{
+  %Surname, Initial.
+  output.bibitem
+
+  %(Year of Publication) Title
+  list.year empty$
+    { make.list.label output.nonnull "" }
+    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  if$
+
+  format.title quote ". " * output new.block
+
+  moduletitle emphasize * output new.block
+
+  format.translators.reverse output
+
+  %DOI or Available at: URL (if required) (Accessed: date)
+  DOI_or_URL output new.block
+
+  note output
+  fin.entry
+}
+
+FUNCTION {multimedia}
+{
+  %Surname, Initial.
+  output.bibitem
+
+  %(Year of Publication) Title
+  list.year empty$
+    { make.list.label output.nonnull "" }
+    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  if$
+
+  format.title quote mediaformat * ". " * output new.block
+
+  moduletitle emphasize * output new.block
+
+  format.translators.reverse output
+
+  %DOI or Available at: URL (if required) (Accessed: date)
+  DOI_or_URL output new.block
+
+  note output
+  fin.entry
+}
+
 FUNCTION {phdthesis}
 { output.bibitem
   list.label.output
@@ -1190,6 +1167,26 @@ FUNCTION {phdthesis}
   place output
   new.block
   DOI_or_URL output new.block
+  note output
+  fin.entry
+}
+
+FUNCTION {photograph}
+{
+  %Surname, Initial.
+  output.bibitem
+
+  %(Year of Publication) Title
+  list.year empty$
+    { make.list.label output.nonnull "" }
+    { list.label.output " \harvardyearleft " list.year * "\harvardyearright \ " * }
+  if$
+
+  title emphasize * output new.block
+
+  %DOI or Available at: URL (if required) (Accessed: date)
+  DOI_or_URL output new.block
+
   note output
   fin.entry
 }
