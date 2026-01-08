@@ -18,6 +18,7 @@
 %   e-mail: simon@bettison.org
 
 % more info: http://tug.ctan.org/info/bibtex/tamethebeast/ttb_en.pdf
+% more info: https://www.citethemrightonline.com/category-list?docid=CTRHarvard
 
 ENTRY
   { address
