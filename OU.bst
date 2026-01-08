@@ -808,6 +808,15 @@ FUNCTION {article}
 
   note output
   fin.entry
+
+% Print article:
+% Norrie, C. et al. (2012) 'Doing it differently? A review of literature on teaching reflective practice across health and social care professions', Reflective Practice, 13(4), pp. 565–578.
+% Electronic article with DOI:
+% Van Dis, E.A.M. et al. (2023) 'ChatGPT: five priorities for research', Nature, 614(7947), pp. 224–226. Available at: https://doi.org/10.1038/d41586-023-00288-7
+% Electronic article with URL (no DOI):
+% Dutta, M. and Marjit, S. (2016) 'Intra-country technology transfer', Indian Economic Review, 51(1/2), new series, pp. 117–127. Available at: http://www.jstor.org/stable/44376239 (Accessed: 27 May 2024).
+% Electronic article with article number:
+% Erbil, D.G. (2020) 'A review of flipped classroom and cooperative learning method within the context of Vygotsky theory', Frontiers in Psychology, 11, article 1157. Available at: https://www.frontiersin.org/article/10.3389/fpsyg.2020.01157 (Accessed: 6 May 2024).
 }
 
 FUNCTION {book}
