@@ -794,6 +794,7 @@ FUNCTION {article}
   " \enspace " * title quote "title" duplicate$ item.check
 
   % Title of Journal, Issue information (that is, volume (unbracketed) and, where applicable, part number, month or season (all in round brackets)), Page reference (if available)
+  journal "journal" item.check
   format.journal * output new.block
 
   %DOI or Available at: URL (if required) (Accessed: date)
